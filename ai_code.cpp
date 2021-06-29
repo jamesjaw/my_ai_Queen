@@ -55,8 +55,7 @@ public:
     std::array<int, 3> disc_count;
     int cur_player;
     
-    int Q_value;
-    int deth;
+    
     Point my_pick_is;
     
     OthelloBoard* parent = nullptr;
@@ -136,7 +135,7 @@ public:
         }
         cur_player = (disc_count[WHITE] + disc_count[BLACK])%2 == 0? BLACK:WHITE;
         next_valid_spots = get_valid_spots();
-        deth = 0;
+        
     }
 
     //copy
@@ -151,12 +150,13 @@ public:
         disc_count[WHITE] = a.disc_count[WHITE];
         cur_player = a.cur_player;
 
-        deth = a.deth;
+        
         //remember to update next_valid_spots
 
     }
     //count Q_value
-    void set_Q_value(){
+    int set_Q_value(){
+        int Q = 0;
         int my_Q = 0;
         int you_Q = 0;
         for(int i=0;i<SIZE;i++){
@@ -172,10 +172,11 @@ public:
                 }
             }
         }
-        Q_value = my_Q - you_Q;
+        Q = my_Q - you_Q;
         //
-        Q_value += next_valid_spots.size() * 3;
+        Q += next_valid_spots.size() * 3;
         //
+        return Q;
     }
 
     std::vector<Point> get_valid_spots() const {
@@ -209,52 +210,52 @@ public:
     
 };
 
-// bulid tree
-void butree(OthelloBoard& root, int h){
-
-    if(root.deth >= h) return;
-
-    for(auto it:root.next_valid_spots){
-        OthelloBoard ch(root);
-        ch.parent = &root;
-        ch.put_disc(it);
-        root.child.push_back(ch);
-        butree(ch , h);
-    }
-}
 
 //find leaf and count Q_value
 int ABPminimax(OthelloBoard& node ,int depth,int A,int B, bool MorU){
-    if(depth == 0 && node.next_valid_spots.empty()){
-        node.set_Q_value();
-        return node.Q_value;
+    if(depth == 0 || node.next_valid_spots.empty()){
+        return node.set_Q_value();
     }
     //my turn
     if(MorU){
-        node.Q_value = -214700000;
-        for(auto& it:node.child){
-            int child_value = ABPminimax(it, depth - 1,A, B, false);
-            node.Q_value = std::max(node.Q_value, child_value);
+        int Q = -214700000;
+        for(auto& it:node.next_valid_spots){
+            OthelloBoard child(node);
+            child.put_disc(it);
+            int child_value = ABPminimax(child, depth - 1,A, B, false);
+            //Q = std::max(Q, child_value);
+            if(child_value > Q){
+                Q = child_value;
+                node.my_pick_is = it;
+            }
+            
             A = std::max(A, child_value);
             if(B <= A){
                 break;
             }
         }
-        return node.Q_value;
+        return Q;
     }
     
     //you turn
     else{
-        node.Q_value = 214700000;
-        for(auto& it:node.child){
-            int child_value = ABPminimax(it, depth - 1,A, B, true);
-            node.Q_value = std::min(node.Q_value, child_value);
+        int Q = 214700000;
+        for(auto& it:node.next_valid_spots){
+            OthelloBoard child(node);
+            child.put_disc(it);
+            int child_value = ABPminimax(child, depth - 1,A, B, true);
+            //Q = std::min(Q, child_value);
+            if(child_value < Q){
+                Q = child_value;
+                node.my_pick_is = it;
+            }
+            
             B = std::min(B, child_value);
             if(B <= A){
                 break;
             }
         }
-        return node.Q_value;
+        return Q;
     }
     
 }
@@ -298,22 +299,14 @@ void write_valid_spot(std::ofstream& fout) {
 
     root.get_valid_spots();
 
-    butree(root, 10);
+    
     ABPminimax(root, 10, -214700000, 214700000, true);
-    int QQ = -214700000;
-    Point pick;
-    auto it = root.child.begin();
-    auto Pit = root.next_valid_spots.begin();
-    for(;it!=root.child.end();it++,Pit++){
-        if(QQ > it->Q_value){
-            QQ = it->Q_value;
-            pick = *Pit;
-        }
-    }
+    fout << root.my_pick_is.x << " " << root.my_pick_is.y << std::endl;
+    
+    
     // Remember to flush the output to ensure the last action is written to file.
-    ///output my choose
     //fout << p.x << " " << p.y << std::endl;
-    fout << pick.x << " " << pick.y << std::endl;
+    
 
     fout.flush();
 }
@@ -329,4 +322,3 @@ int main(int, char** argv) {
     fout.close();
     return 0;
 }
-
