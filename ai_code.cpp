@@ -9,6 +9,7 @@
 
 using namespace std;
 
+
 int value_map[64] = {90,-60,10,10,10,10,-60,90,
                      -60,-80,5,5,5,5,-80,-60,
                      10,5,1,1,1,1,5,10,
@@ -36,6 +37,11 @@ struct Point {
         return Point(x - rhs.x, y - rhs.y);
     }
 };
+
+int player;
+const int SIZE = 8;
+std::array<std::array<int, SIZE>, SIZE> board;
+std::vector<Point> next_valid_spots;
 
 class OthelloBoard {
 public:
@@ -164,7 +170,7 @@ public:
                 if(board[i][j] == EMPTY){
                     //do nothing
                 }
-                else if(board[i][j] == cur_player){
+                else if(board[i][j] == player){
                     my_Q += value_map[i*8 + j];
                 }
                 else{
@@ -214,6 +220,7 @@ public:
 //find leaf and count Q_value
 int ABPminimax(OthelloBoard& node ,int depth,int A,int B, bool MorU){
     if(depth == 0 || node.next_valid_spots.empty()){
+        cout<<node.set_Q_value()<<"\n";
         return node.set_Q_value();
     }
     //my turn
@@ -223,11 +230,7 @@ int ABPminimax(OthelloBoard& node ,int depth,int A,int B, bool MorU){
             OthelloBoard child(node);
             child.put_disc(it);
             int child_value = ABPminimax(child, depth - 1,A, B, false);
-            //Q = std::max(Q, child_value);
-            if(child_value > Q){
-                Q = child_value;
-                node.my_pick_is = it;
-            }
+            Q = std::max(Q, child_value);
             
             A = std::max(A, child_value);
             if(B <= A){
@@ -244,11 +247,7 @@ int ABPminimax(OthelloBoard& node ,int depth,int A,int B, bool MorU){
             OthelloBoard child(node);
             child.put_disc(it);
             int child_value = ABPminimax(child, depth - 1,A, B, true);
-            //Q = std::min(Q, child_value);
-            if(child_value < Q){
-                Q = child_value;
-                node.my_pick_is = it;
-            }
+            Q = std::min(Q, child_value);
             
             B = std::min(B, child_value);
             if(B <= A){
@@ -260,11 +259,28 @@ int ABPminimax(OthelloBoard& node ,int depth,int A,int B, bool MorU){
     
 }
 
+Point Queen(){
+    Point p;
+    //pick
+    p = next_valid_spots[0];
+    int maxQ = -214700000;
+    for(auto& it:next_valid_spots){
+        if((it.x == 0 && it.y == 0) || (it.x == 0 && it.y == 7) || (it.x == 7 && it.y == 0) || (it.x == 7 && it.y == 7)){
+            return it;
+        }
+        OthelloBoard next(board);
+        next.put_disc(it);
+        int child_Q = ABPminimax(next,3,-214700000,214700000,false);
+        if(maxQ <= child_Q){
+            maxQ = child_Q;
+            p = it;
+        }
+    }
+    return p;
+}
 
-int player;
-const int SIZE = 8;
-std::array<std::array<int, SIZE>, SIZE> board;
-std::vector<Point> next_valid_spots;
+
+
 
 
 void read_board(std::ifstream& fin) {
@@ -290,9 +306,9 @@ void write_valid_spot(std::ofstream& fout) {
     int n_valid_spots = next_valid_spots.size();
     srand(time(NULL));
     // Choose random spot. (Not random uniform here)
-    int index = (rand() % n_valid_spots);
-    Point p = next_valid_spots[index];
-    fout << p.x << " " << p.y << std::endl;
+    //int index = (rand() % n_valid_spots);
+    //Point p = next_valid_spots[index];
+    //fout << p.x << " " << p.y << std::endl;
     ///The Queen's Gambit
 
     OthelloBoard root(board);
@@ -300,8 +316,8 @@ void write_valid_spot(std::ofstream& fout) {
     root.get_valid_spots();
 
     
-    ABPminimax(root, 10, -214700000, 214700000, true);
-    fout << root.my_pick_is.x << " " << root.my_pick_is.y << std::endl;
+    Point anw = Queen();
+    fout << anw.x << " " << anw.y << std::endl;
     
     
     // Remember to flush the output to ensure the last action is written to file.
@@ -311,7 +327,7 @@ void write_valid_spot(std::ofstream& fout) {
     fout.flush();
 }
 
-
+/*
 int main(int, char** argv) {
     std::ifstream fin(argv[1]);
     std::ofstream fout(argv[2]);
@@ -320,5 +336,18 @@ int main(int, char** argv) {
     write_valid_spot(fout);
     fin.close();
     fout.close();
+    return 0;
+}
+*/
+
+int main(){
+    cin>>player;
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            cin >> board[i][j];
+        }
+    }
+    OthelloBoard root(board);
+    ABPminimax(root, 7, -214700000, 214700000, true);
     return 0;
 }
