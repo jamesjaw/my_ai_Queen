@@ -60,10 +60,10 @@ public:
     std::vector<Point> next_valid_spots;
     std::array<int, 3> disc_count;
     int cur_player;
-    
-    
+
+
     Point my_pick_is;
-    
+
     OthelloBoard* parent = nullptr;
     std::vector<OthelloBoard> child;
 
@@ -141,7 +141,7 @@ public:
         }
         cur_player = (disc_count[WHITE] + disc_count[BLACK])%2 == 0? BLACK:WHITE;
         next_valid_spots = get_valid_spots();
-        
+
     }
 
     //copy
@@ -156,7 +156,7 @@ public:
         disc_count[WHITE] = a.disc_count[WHITE];
         cur_player = a.cur_player;
 
-        
+
         //remember to update next_valid_spots
 
     }
@@ -210,10 +210,10 @@ public:
         cur_player = get_next_player(cur_player);
         // find where can put chese
         next_valid_spots = get_valid_spots();
-       
+
         return true;
     }
-    
+
 };
 
 
@@ -231,7 +231,7 @@ int ABPminimax(OthelloBoard& node ,int depth,int A,int B, bool MorU){
             child.put_disc(it);
             int child_value = ABPminimax(child, depth - 1,A, B, false);
             Q = std::max(Q, child_value);
-            
+
             A = std::max(A, child_value);
             if(B <= A){
                 break;
@@ -239,7 +239,7 @@ int ABPminimax(OthelloBoard& node ,int depth,int A,int B, bool MorU){
         }
         return Q;
     }
-    
+
     //you turn
     else{
         int Q = 214700000;
@@ -248,7 +248,7 @@ int ABPminimax(OthelloBoard& node ,int depth,int A,int B, bool MorU){
             child.put_disc(it);
             int child_value = ABPminimax(child, depth - 1,A, B, true);
             Q = std::min(Q, child_value);
-            
+
             B = std::min(B, child_value);
             if(B <= A){
                 break;
@@ -256,7 +256,7 @@ int ABPminimax(OthelloBoard& node ,int depth,int A,int B, bool MorU){
         }
         return Q;
     }
-    
+
 }
 
 Point Queen(){
@@ -315,19 +315,19 @@ void write_valid_spot(std::ofstream& fout) {
 
     root.get_valid_spots();
 
-    
+
     Point anw = Queen();
     fout << anw.x << " " << anw.y << std::endl;
-    
-    
+
+
     // Remember to flush the output to ensure the last action is written to file.
     //fout << p.x << " " << p.y << std::endl;
-    
+
 
     fout.flush();
 }
 
-/*
+
 int main(int, char** argv) {
     std::ifstream fin(argv[1]);
     std::ofstream fout(argv[2]);
@@ -338,8 +338,8 @@ int main(int, char** argv) {
     fout.close();
     return 0;
 }
-*/
 
+/*
 int main(){
     cin>>player;
     for (int i = 0; i < SIZE; i++) {
@@ -351,3 +351,4 @@ int main(){
     ABPminimax(root, 7, -214700000, 214700000, true);
     return 0;
 }
+*/
