@@ -1,8 +1,8 @@
+沿用助教的code main+random:
+
 0 = 空格
 1 = 黑
 2 = 白
-
-
 
 public:
 void rest() : 重置
@@ -20,3 +20,10 @@ bool put_disc(Point p) : 在p下子，如果不合法就輸了
     int get_next_player(int p) const : 換人
 
 
+ptt黑白棋基礎教學:
+1.
+https://www.ptt.cc/bbs/othello/M.1298698178.A.760.html
+2.
+https://www.ptt.cc/bbs/othello/M.1299304992.A.54A.html
+3.
+https://www.ptt.cc/bbs/othello/M.1300646760.A.440.html
