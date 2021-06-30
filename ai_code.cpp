@@ -160,7 +160,7 @@ public:
         //remember to update next_valid_spots
 
     }
-
+    
     std::vector<Point> get_valid_spots() const {
         std::vector<Point> valid_spots;
         for (int i = 0; i < SIZE; i++) {
@@ -189,7 +189,7 @@ public:
 
         return true;
     }
-
+    
     //evl1:value sheet
     int set_Q_value(){
         int Q = 0;
@@ -202,7 +202,7 @@ public:
                     Q += value_map[i*8 + j];
                 }
                 else if(board[i][j] == get_next_player(player)){
-                    //Q -= value_map[i*8 + j];
+                    Q -= value_map[i*8 + j];
                 }
             }
         }
@@ -222,12 +222,13 @@ public:
         int you_move = (int)me.size();
         //回復原始的player
         cur_player = o_player;
-
+        
         return me_move - you_move;
     }
-
+    
     //evl3:stable
     int stable_value(){
+        
         return 1;
     }
 };
@@ -246,7 +247,11 @@ int ABPminimax(OthelloBoard& node ,int depth,int A,int B, bool MorU){
         }
         cout<<"\n\n";
         */
-        return node.set_Q_value() + node.move_value()*15;
+        int move = 0;
+        if(node.disc_count[0] > 40) move = node.move_value()*15;
+        else if(node.disc_count[0] > 20) move = node.move_value()*20;
+        else if(node.disc_count[0] > 0) move = node.move_value()*25;
+        return node.set_Q_value() + move;
     }
     //my turn
     if(MorU){
@@ -294,10 +299,10 @@ Point Queen(){
         if((it.x == 0 && it.y == 0) || (it.x == 0 && it.y == 7) || (it.x == 7 && it.y == 0) || (it.x == 7 && it.y == 7)){
             return it;
         }
-
+        
         OthelloBoard next(board);
         next.put_disc(it);
-        int child_Q = ABPminimax(next,3,-214700000,214700000,false);
+        int child_Q = ABPminimax(next,5,-214700000,214700000,false);
         if(maxQ <= child_Q){
             maxQ = child_Q;
             p = it;
@@ -354,7 +359,7 @@ void write_valid_spot(std::ofstream& fout) {
     fout.flush();
 }
 
-
+/*
 int main(int, char** argv) {
     std::ifstream fin(argv[1]);
     std::ofstream fout(argv[2]);
@@ -365,8 +370,8 @@ int main(int, char** argv) {
     fout.close();
     return 0;
 }
+*/
 
-/*
 int main(){
     cin>>player;
     for (int i = 0; i < SIZE; i++) {
@@ -378,5 +383,5 @@ int main(){
     ABPminimax(root, 7, -214700000, 214700000, true);
     return 0;
 }
-*/
+
 
