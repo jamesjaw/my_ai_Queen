@@ -160,30 +160,7 @@ public:
         //remember to update next_valid_spots
 
     }
-    //count Q_value
-    int set_Q_value(){
-        int Q = 0;
-        int my_Q = 0;
-        int you_Q = 0;
-        for(int i=0;i<SIZE;i++){
-            for(int j=0;j<SIZE;j++){
-                if(board[i][j] == EMPTY){
-                    //do nothing
-                }
-                else if(board[i][j] == player){
-                    Q += value_map[i*8 + j];
-                }
-                else{
-                    Q -= value_map[i*8 + j];
-                }
-            }
-        }
-        //Q = my_Q - you_Q;//
-        //Q += next_valid_spots.size() * 3;
-        //
-        return Q;
-    }
-
+    
     std::vector<Point> get_valid_spots() const {
         std::vector<Point> valid_spots;
         for (int i = 0; i < SIZE; i++) {
@@ -212,15 +189,64 @@ public:
 
         return true;
     }
-
+    
+    //evl1:value sheet
+    int set_Q_value(){
+        int Q = 0;
+        for(int i=0;i<SIZE;i++){
+            for(int j=0;j<SIZE;j++){
+                if(board[i][j] == EMPTY){
+                    //do nothing
+                }
+                else if(board[i][j] == player){
+                    Q += value_map[i*8 + j];
+                }
+                else if(board[i][j] == get_next_player(player)){
+                    Q -= value_map[i*8 + j];
+                }
+            }
+        }
+        return Q;
+    }
+    //evl2:moving ablity
+    int move_value(){
+        //紀錄原始玩家
+        int o_player = cur_player;
+        //算我方行動力
+        cur_player = player;
+        std::vector<Point> me = get_valid_spots();
+        int me_move = (int)me.size();
+        //對手行動力
+        cur_player = get_next_player(player);
+        std::vector<Point> you = get_valid_spots();
+        int you_move = (int)me.size();
+        //回復原始的player
+        cur_player = o_player;
+        
+        return me_move - you_move;
+    }
+    
+    //evl3:stable
+    int stable_value(){
+        return 1;
+    }
 };
 
 
 //find leaf and count Q_value
 int ABPminimax(OthelloBoard& node ,int depth,int A,int B, bool MorU){
     if(depth == 0 || node.next_valid_spots.empty()){
-        cout<<node.set_Q_value()<<"\n";
-        return node.set_Q_value();
+        /*
+        cout<<"Q = "<<node.set_Q_value()<<"\n";
+        for(int i=0;i<8;i++){
+            for(int j=0;j<8;j++){
+                cout<<node.board[i][j]<<" ";
+            }
+            cout<<"\n";
+        }
+        cout<<"\n\n";
+        */
+        return node.set_Q_value() + node.move_value()*15;
     }
     //my turn
     if(MorU){
@@ -263,10 +289,12 @@ Point Queen(){
     //pick
     p = next_valid_spots[0];
     int maxQ = -214700000;
+    //有角必下，我就爛
     for(auto& it:next_valid_spots){
         if((it.x == 0 && it.y == 0) || (it.x == 0 && it.y == 7) || (it.x == 7 && it.y == 0) || (it.x == 7 && it.y == 7)){
             return it;
         }
+        
         OthelloBoard next(board);
         next.put_disc(it);
         int child_Q = ABPminimax(next,3,-214700000,214700000,false);
@@ -351,3 +379,4 @@ int main(){
     return 0;
 }
 */
+
