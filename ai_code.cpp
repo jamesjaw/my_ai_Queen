@@ -19,6 +19,14 @@ int value_map[64] = {99, -8, 8,  6,  6,  8,  -8, 99 ,
             -8, -24,  -4, -3, -3, -4, -24,  -8 ,
             99, -8, 8,  6,  6,  8,  -8, 99 };
 
+int value_map2[64] = {500,-25,10,5,5,10,-25,500,
+                      -25,-45,1,1,1,1,-45,-25,
+                      10,1,3,2,2,3,1,10,
+                      5,1,2,1,1,2,1,5,
+                      5,1,2,1,1,2,1,5,
+                      10,1,3,2,2,3,1,10,
+                      -25,-45,1,1,1,1,-45,-25,
+                      500,-25,10,5,5,10,-25,500 };
 //===================================================
 struct Point {
     int x, y;
@@ -67,7 +75,7 @@ public:
     OthelloBoard* parent = nullptr;
     std::vector<OthelloBoard> child;
 
-private:
+//private:
     int get_next_player(int player) const {
         return 3 - player;
     }
@@ -127,7 +135,7 @@ private:
             }
         }
     }
-public:
+//public:
     OthelloBoard(){
 
     }
@@ -160,7 +168,7 @@ public:
         //remember to update next_valid_spots
 
     }
-    
+
     std::vector<Point> get_valid_spots() const {
         std::vector<Point> valid_spots;
         for (int i = 0; i < SIZE; i++) {
@@ -189,7 +197,7 @@ public:
 
         return true;
     }
-    
+
     //evl1:value sheet
     int set_Q_value(){
         int Q = 0;
@@ -199,10 +207,16 @@ public:
                     //do nothing
                 }
                 else if(board[i][j] == player){
-                    Q += value_map[i*8 + j];
+                    if(disc_count[EMPTY] >20)
+                        Q += value_map[i*8 + j];
+                    else
+                        Q += value_map2[i*8 + j];
                 }
                 else if(board[i][j] == get_next_player(player)){
-                    Q -= value_map[i*8 + j];
+                    if(disc_count[EMPTY] >20)
+                        Q -= value_map[i*8 + j];
+                    else
+                        Q += value_map2[i*8 + j];
                 }
             }
         }
@@ -222,22 +236,121 @@ public:
         int you_move = (int)me.size();
         //回復原始的player
         cur_player = o_player;
-        
+
         return me_move - you_move;
     }
-    
+
     //evl3:stable
     int stable_value(){
-        
-        return 1;
+        int s_value = 0;
+        if(board[0][0] == player){
+            s_value++;
+            Point p1(0,0);
+            Point L1(0,1);
+            Point L2(1,0);
+            Point p2(0,0);
+            
+            p1 = p1 + L1;
+            while(is_spot_on_board(p1)){
+                if(board[p1.x][p1.y]==player)
+                    s_value++;
+                else
+                    break;
+                p1 = p1 + L1;
+            }
+            
+            p2 = p2 + L2;
+            while(is_spot_on_board(p2)){
+                if(board[p2.x][p2.y]==player)
+                    s_value++;
+                else
+                    break;
+                p2 = p2 + L2;
+            }
+            
+        }
+        if(board[0][7] == player){
+            s_value++;
+            Point p1(0,7);
+            Point L1(0,-1);
+            Point L2(1,0);
+            Point p2(0,7);
+            
+             p1 = p1 + L1;
+            while(is_spot_on_board(p1)){
+                if(board[p1.x][p1.y]==player)
+                    s_value++;
+                else
+                    break;
+                p1 = p1 + L1;
+            }
+            
+            p2 = p2 + L2;
+            while(is_spot_on_board(p2)){
+                if(board[p2.x][p2.y]==player)
+                    s_value++;
+                else
+                    break;
+                p2 = p2 + L2;
+            }
+            
+        }
+        if(board[7][7] == player){
+            s_value++;
+            Point p1(7,7);
+            Point L1(0,-1);
+            Point L2(-1,0);
+            Point p2(7,7);
+            
+             p1 = p1 + L1;
+            while(is_spot_on_board(p1)){
+                if(board[p1.x][p1.y]==player)
+                    s_value++;
+                else
+                    break;
+                p1 = p1 + L1;
+            }
+            
+            p2 = p2 + L2;
+            while(is_spot_on_board(p2)){
+                if(board[p2.x][p2.y]==player)
+                    s_value++;
+                else
+                    break;
+                p2 = p2 + L2;
+            }
+        }
+        if(board[7][0] == player){
+            s_value++;
+            Point p1(7,0);
+            Point L1(0,1);
+            Point L2(-1,0);
+            Point p2(7,0);
+            
+             p1 = p1 + L1;
+            while(is_spot_on_board(p1)){
+                if(board[p1.x][p1.y]==player)
+                    s_value++;
+                else
+                    break;
+                p1 = p1 + L1;
+            }
+            
+            p2 = p2 + L2;
+            while(is_spot_on_board(p2)){
+                if(board[p2.x][p2.y]==player)
+                    s_value++;
+                else
+                    break;
+                p2 = p2 + L2;
+            }
+        }
+
+        return s_value;
     }
 };
 
-
-//find leaf and count Q_value
-int ABPminimax(OthelloBoard& node ,int depth,int A,int B, bool MorU){
-    if(depth == 0 || node.next_valid_spots.empty()){
-        /*
+/*
         cout<<"Q = "<<node.set_Q_value()<<"\n";
         for(int i=0;i<8;i++){
             for(int j=0;j<8;j++){
@@ -246,7 +359,10 @@ int ABPminimax(OthelloBoard& node ,int depth,int A,int B, bool MorU){
             cout<<"\n";
         }
         cout<<"\n\n";
-        */
+*/
+//find leaf and count Q_value
+int ABPminimax(OthelloBoard& node ,int depth,int A,int B, bool MorU){
+    if(depth == 0 || node.next_valid_spots.empty()){
         int move = 0;
         if(node.disc_count[0] > 40) move = node.move_value()*15;
         else if(node.disc_count[0] > 20) move = node.move_value()*20;
@@ -299,13 +415,15 @@ Point Queen(){
         if((it.x == 0 && it.y == 0) || (it.x == 0 && it.y == 7) || (it.x == 7 && it.y == 0) || (it.x == 7 && it.y == 7)){
             return it;
         }
-        
+
         OthelloBoard next(board);
         next.put_disc(it);
-        int child_Q = ABPminimax(next,5,-214700000,214700000,false);
+        int child_Q = ABPminimax(next,4,-214700000,214700000,false);
         if(maxQ <= child_Q){
             maxQ = child_Q;
             p = it;
+            fout << p.x << " " << p.y << std::endl;
+            fout.flush();
         }
     }
     return p;
@@ -331,6 +449,7 @@ void read_valid_spots(std::ifstream& fin) {
     for (int i = 0; i < n_valid_spots; i++) {
         fin >> x >> y;
         next_valid_spots.push_back({x, y});
+        
     }
 }
 
@@ -350,7 +469,7 @@ void write_valid_spot(std::ofstream& fout) {
 
     Point anw = Queen();
     fout << anw.x << " " << anw.y << std::endl;
-
+    
 
     // Remember to flush the output to ensure the last action is written to file.
     //fout << p.x << " " << p.y << std::endl;
@@ -359,7 +478,7 @@ void write_valid_spot(std::ofstream& fout) {
     fout.flush();
 }
 
-/*
+
 int main(int, char** argv) {
     std::ifstream fin(argv[1]);
     std::ofstream fout(argv[2]);
@@ -370,8 +489,8 @@ int main(int, char** argv) {
     fout.close();
     return 0;
 }
-*/
 
+/*
 int main(){
     cin>>player;
     for (int i = 0; i < SIZE; i++) {
@@ -384,4 +503,4 @@ int main(){
     return 0;
 }
 
-
+*/
