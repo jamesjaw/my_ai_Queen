@@ -10,7 +10,7 @@
 using namespace std;
 
 
-int value_map[64] = {99, -80, 8,  6,  6,  8,  -80, 99 ,
+int value_map1[64] = {99, -80, 8,  6,  6,  8,  -80, 99 ,
             -80, -240,  -4, -3, -3, -4, -240,  -80  ,
             8, -4, 7,  4,  4,  7,  -4, 8 ,
             6,  -3, 4,  0,  0,  4,  -3, 6 ,
@@ -19,14 +19,14 @@ int value_map[64] = {99, -80, 8,  6,  6,  8,  -80, 99 ,
             -80, -240,  -4, -3, -3, -4, -240,  -80 ,
             99, -80, 8,  6,  6,  8,  -80, 99 };
 
-int value_map2[64] = {500,-25,10,5,5,10,-25,500,
-                      -25,-45,1,1,1,1,-45,-25,
+int value_map2[64] = {500,-35,10,5,5,10,-35,500,
+                      -35,-45,1,1,1,1,-45,-25,
                       10,1,3,2,2,3,1,10,
                       5,1,2,1,1,2,1,5,
                       5,1,2,1,1,2,1,5,
                       10,1,3,2,2,3,1,10,
-                      -25,-45,1,1,1,1,-45,-25,
-                      500,-25,10,5,5,10,-25,500 };
+                      -35,-45,1,1,1,1,-45,-25,
+                      500,-35,10,5,5,10,-35,500 };
 
                       int value_map3[64] = {500,-25,10,5,5,10,-25,500,
                                             -250,-45,1,1,1,1,-45,-250,
@@ -386,10 +386,10 @@ public:
 int ABPminimax(OthelloBoard& node ,int depth,int A,int B, bool MorU){
     if(depth == 0 || node.next_valid_spots.empty()){
         int move = 0;
-        if(node.disc_count[0] > 40) move = node.move_value()*15;
-        else if(node.disc_count[0] > 20) move = node.move_value()*15;
-        else if(node.disc_count[0] > 0) move = node.move_value()*15;
-        return node.set_Q_value() + move + node.stable_value()*10;
+        if(node.disc_count[0] > 40) move = node.move_value()*10;
+        else if(node.disc_count[0] > 20) move = node.move_value()*10;
+        else if(node.disc_count[0] > 0) move = node.move_value()*10;
+        return node.set_Q_value() + move ;
     }
     //my turn
     if(MorU){
