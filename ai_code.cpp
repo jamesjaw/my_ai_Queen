@@ -160,7 +160,7 @@ public:
         //remember to update next_valid_spots
 
     }
-    
+
     std::vector<Point> get_valid_spots() const {
         std::vector<Point> valid_spots;
         for (int i = 0; i < SIZE; i++) {
@@ -189,7 +189,7 @@ public:
 
         return true;
     }
-    
+
     //evl1:value sheet
     int set_Q_value(){
         int Q = 0;
@@ -202,7 +202,7 @@ public:
                     Q += value_map[i*8 + j];
                 }
                 else if(board[i][j] == get_next_player(player)){
-                    Q -= value_map[i*8 + j];
+                    //Q -= value_map[i*8 + j];
                 }
             }
         }
@@ -222,10 +222,10 @@ public:
         int you_move = (int)me.size();
         //回復原始的player
         cur_player = o_player;
-        
+
         return me_move - you_move;
     }
-    
+
     //evl3:stable
     int stable_value(){
         return 1;
@@ -294,7 +294,7 @@ Point Queen(){
         if((it.x == 0 && it.y == 0) || (it.x == 0 && it.y == 7) || (it.x == 7 && it.y == 0) || (it.x == 7 && it.y == 7)){
             return it;
         }
-        
+
         OthelloBoard next(board);
         next.put_disc(it);
         int child_Q = ABPminimax(next,3,-214700000,214700000,false);
