@@ -1,5 +1,5 @@
-沿用助教的code main+random:
-
+沿用助教的code (main+random)功能完整太棒了:
+主教的code說明書:
 0 = 空格
 1 = 黑
 2 = 白
@@ -27,3 +27,16 @@ https://www.ptt.cc/bbs/othello/M.1298698178.A.760.html
 https://www.ptt.cc/bbs/othello/M.1299304992.A.54A.html
 3.
 https://www.ptt.cc/bbs/othello/M.1300646760.A.440.html
+
+abp參考:
+https://www.youtube.com/watch?v=l-hh51ncgDI
+
+估值方式參考:
+https://zhuanlan.zhihu.com/p/35121997
+
+我採用的估值方法:
+估值表(前期,後期):評估場上局勢
+活動度(前,中,後):雙方能下的位置差距(我-你)
+穩定子:不能被翻轉的子很重要
+
+搜尋樹使用阿發貝塔剪枝來避免無用之搜索
